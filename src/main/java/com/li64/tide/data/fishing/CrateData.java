@@ -2,7 +2,7 @@ package com.li64.tide.data.fishing;
 
 import com.google.common.collect.ImmutableList;
 import com.li64.tide.Tide;
-import com.li64.tide.data.ValidatableDataEntry;
+import com.li64.tide.data.ModAssociatedEntry;
 import com.li64.tide.data.commands.TestType;
 import com.li64.tide.data.loot.LootTableRef;
 import com.li64.tide.datagen.fabric.providers.SimpleDataOutput;
@@ -33,16 +33,16 @@ import java.util.Optional;
 public record CrateData(BlockStateProvider blockProvider,
                         /*? if >= 1.21 {*/Optional<ResourceKey<LootTable>> lootTable,
                         /*?} else*//*Optional<ResourceLocation> lootTable,*/
-                        Optional<String> associatedMod,
+                        List<String> associatedMods,
                         List<FishingCondition> conditions,
                         List<FishingModifier> modifiers,
-                        double weight, double quality) implements FishingEntry, ValidatableDataEntry {
+                        double weight, double quality) implements FishingEntry, ModAssociatedEntry {
 
     public static final Codec<CrateData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             BlockStateProvider.CODEC.fieldOf("block").forGetter(CrateData::blockProvider),
             /*? if >= 1.21 {*/ResourceKey.codec(Registries.LOOT_TABLE).optionalFieldOf("loot_table").forGetter(CrateData::lootTable),
             /*?} else*//*ResourceLocation.CODEC.optionalFieldOf("loot_table").forGetter(CrateData::lootTable),*/
-            Codec.STRING.optionalFieldOf("associated_mod").forGetter(CrateData::associatedMod),
+            Codec.STRING.listOf().optionalFieldOf("associated_mods", List.of()).forGetter(CrateData::associatedMods),
             FishingCondition.CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(CrateData::conditions),
             FishingModifier.CODEC.listOf().optionalFieldOf("modifiers", List.of()).forGetter(CrateData::modifiers),
             Codec.DOUBLE.optionalFieldOf("weight", 0.0).forGetter(CrateData::weight),
@@ -82,17 +82,6 @@ public record CrateData(BlockStateProvider blockProvider,
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    @Override
-    public boolean isValid() {
-        return this.associatedMod().map(Tide.PLATFORM::isModLoaded).orElse(true) || this.associatedMod()
-                .map(id -> Tide.PLATFORM.isModLoaded(id.replace("-", "_"))).orElse(true);
-    }
-
-    @Override
-    public String invalidReason() {
-        return "mod '" + this.associatedMod().orElse("undefined") + "' is not loaded";
     }
 
     public static class Builder {
@@ -239,7 +228,7 @@ public record CrateData(BlockStateProvider blockProvider,
         public CrateData build() {
             if (block == null) throw new IllegalStateException("Crate block provider must be provided");
             return new CrateData(block, Optional.ofNullable(lootKey),
-                    Optional.empty(),
+                    List.of(),
                     ImmutableList.copyOf(conditions),
                     ImmutableList.copyOf(modifiers),
                     weight, quality

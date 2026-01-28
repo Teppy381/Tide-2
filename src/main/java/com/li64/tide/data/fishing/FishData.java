@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.li64.tide.Tide;
 import com.li64.tide.TideConfig;
 import com.li64.tide.compat.seasons.Season;
+import com.li64.tide.data.ModAssociatedEntry;
 import com.li64.tide.data.commands.TestType;
 import com.li64.tide.data.item.TideItemData;
 import com.li64.tide.datagen.fabric.providers.SimpleDataOutput;
@@ -41,8 +42,7 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 
 /*? if <1.21 {*/
-/*import com.li64.tide.data.ValidatableDataEntry;
-import java.util.function.Function;
+/*import java.util.function.Function;
 *///?}
 
 import java.util.*;
@@ -50,6 +50,7 @@ import java.util.function.Consumer;
 
 public record FishData(/*? if >=1.21 {*/ Holder<Item> fish,
                        /*?} else*//*ResourceKey<Item> fishKey,*/
+                       List<String> associatedMods,
                        Optional<Holder<Item>> bucket,
                        List<FishingCondition> conditions,
                        List<FishingModifier> modifiers,
@@ -60,7 +61,7 @@ public record FishData(/*? if >=1.21 {*/ Holder<Item> fish,
                        MinigameBehavior behavior,
                        Optional<SizeData> size,
                        Optional<DisplayData> display,
-                       Optional<Holder<Item>> parent) implements FishingEntry/*? if <1.21 {*//*, ValidatableDataEntry*//*?}*/ {
+                       Optional<Holder<Item>> parent) implements FishingEntry, ModAssociatedEntry {
     public static LootTable VANILLA_FISH_TABLE;
 
     private static Map<Item, FishData> FISH_BY_ITEM;
@@ -70,6 +71,7 @@ public record FishData(/*? if >=1.21 {*/ Holder<Item> fish,
     public static final Codec<FishData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             /*? if >=1.21 {*/BuiltInRegistries.ITEM.holderByNameCodec().fieldOf("fish").forGetter(FishData::fish),
             /*?} else*//*ResourceKey.codec(Registries.ITEM).fieldOf("fish").forGetter(FishData::fishKey),*/
+            Codec.STRING.listOf().optionalFieldOf("associated_mods", List.of()).forGetter(FishData::associatedMods),
             BuiltInRegistries.ITEM.holderByNameCodec().optionalFieldOf("bucket").forGetter(FishData::bucket),
             FishingCondition.CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(FishData::conditions),
             FishingModifier.CODEC.listOf().optionalFieldOf("modifiers", List.of()).forGetter(FishData::modifiers),
@@ -179,11 +181,12 @@ public record FishData(/*? if >=1.21 {*/ Holder<Item> fish,
 
     @Override
     public boolean isValid() {
-        return BuiltInRegistries.ITEM.getHolder(fishKey).isPresent();
+        return BuiltInRegistries.ITEM.getHolder(fishKey).isPresent() && ModAssociatedEntry.super.isValid();
     }
 
     @Override
     public String invalidReason() {
+        if (!ModAssociatedEntry.super.isValid()) return ModAssociatedEntry.super.invalidReason();
         return "fish item '" + fishKey.location() + "' was not found";
     }
     *///?}
@@ -475,6 +478,7 @@ public record FishData(/*? if >=1.21 {*/ Holder<Item> fish,
                     /*fish.unwrap().map(Function.identity(), item ->
                             BuiltInRegistries.ITEM.getResourceKey(item).orElseThrow()),
                     *///?}
+                    List.of(),
                     Optional.ofNullable(bucket),
                     ImmutableList.copyOf(conditions),
                     ImmutableList.copyOf(modifiers),

@@ -2,6 +2,7 @@ package com.li64.tide.data.fishing;
 
 import com.google.common.collect.ImmutableList;
 import com.li64.tide.Tide;
+import com.li64.tide.data.ModAssociatedEntry;
 import com.li64.tide.data.loot.LootTableRef;
 import com.li64.tide.datagen.fabric.providers.SimpleDataOutput;
 import com.li64.tide.data.fishing.conditions.FishingCondition;
@@ -27,13 +28,15 @@ import java.util.List;
 
 public record FishingLootData(/*? if >= 1.21 {*/ResourceKey<LootTable> lootTable,
                               /*?} else*//*ResourceLocation lootTable,*/
+                              List<String> associatedMods,
                               List<FishingCondition> conditions,
                               List<FishingModifier> modifiers,
-                              double weight, double quality) implements FishingEntry {
+                              double weight, double quality) implements FishingEntry, ModAssociatedEntry {
 
     public static final Codec<FishingLootData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             /*? if >= 1.21 {*/ResourceKey.codec(Registries.LOOT_TABLE).fieldOf("loot_table").forGetter(FishingLootData::lootTable),
              /*?} else*//*ResourceLocation.CODEC.fieldOf("loot_table").forGetter(FishingLootData::lootTable),*/
+            Codec.STRING.listOf().optionalFieldOf("associated_mods", List.of()).forGetter(FishingLootData::associatedMods),
             FishingCondition.CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(FishingLootData::conditions),
             FishingModifier.CODEC.listOf().optionalFieldOf("modifiers", List.of()).forGetter(FishingLootData::modifiers),
             Codec.DOUBLE.optionalFieldOf("weight", 0.0).forGetter(FishingLootData::weight),
@@ -185,6 +188,7 @@ public record FishingLootData(/*? if >= 1.21 {*/ResourceKey<LootTable> lootTable
         public FishingLootData build() {
             if (lootKey == null) throw new IllegalStateException("Loot table key must be provided");
             return new FishingLootData(lootKey,
+                    List.of(),
                     ImmutableList.copyOf(conditions),
                     ImmutableList.copyOf(modifiers),
                     weight, quality

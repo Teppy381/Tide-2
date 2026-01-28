@@ -1,3 +1,16 @@
+## Tide v2.0.3 - 2/??/26
+
+### Changes
+- Optional `associated_mods` property added to all fishing data files
+
+### TODO
+- Fix chest rendering bug with crate entities
+- Fix Voidseeker not working on forge 1.20.1
+- Fix fishing real not logging catches
+- Fix mouse tweaks satchel bug
+
+---
+
 ## Tide v2.0.2 - 1/19/26
 
 ---
