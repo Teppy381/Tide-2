@@ -1,6 +1,7 @@
 ## Tide v2.0.3 - 2/??/26
 
 ### Changes
+- Fixed a critical bug where fish with time conditions were uncatchable after Day 0
 - Optional `associated_mods` property added to all fishing data files
 
 ### TODO

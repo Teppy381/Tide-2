@@ -183,6 +183,11 @@ public class TideUtils {
     public static LootTable getLootTable(ResourceKey<LootTable> key, MinecraftServer server) {
         return server.reloadableRegistries().getLootTable(key);
     }
+
+    public static long getTimeOfDay(ServerLevel level) {
+        return level.getDayTime() % 24000;
+    }
+
     //?} else {
     /*public static LootTable getLootTable(ResourceLocation id, MinecraftServer server) {
          return server.getLootData().getLootTable(id);

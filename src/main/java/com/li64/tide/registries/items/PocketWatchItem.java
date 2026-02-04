@@ -13,6 +13,6 @@ public class PocketWatchItem extends AbstractProfilingItem {
 
     @Override
     public Component getDisplayedInfo(ServerLevel level, ServerPlayer player) {
-        return Component.literal(TideUtils.ticksToRealTime(level.getDayTime(), Tide.CONFIG.journal.useAmPm));
+        return Component.literal(TideUtils.ticksToRealTime(TideUtils.getTimeOfDay(level), Tide.CONFIG.journal.useAmPm));
     }
 }
