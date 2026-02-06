@@ -588,10 +588,11 @@ public class TideFishingHook extends Projectile {
                     if (medium == FishingMedium.VOID) TideCriteriaTriggers.FISHED_IN_VOID.trigger(serverPlayer);
                     CriteriaTriggers.FISHING_ROD_HOOKED.trigger(serverPlayer, rod, player.fishing, hookedItems);
 
+                    List<ItemStack> hookedItemsCopy = hookedItems.stream().map(ItemStack::copy).toList();
                     //? if neoforge {
-                    /*NeoForge.EVENT_BUS.post(new ItemFishedEvent(List.copyOf(hookedItems), this.onGround() ? 2 : 1, player.fishing));
+                    /*NeoForge.EVENT_BUS.post(new ItemFishedEvent(List.copyOf(hookedItemsCopy), this.onGround() ? 2 : 1, player.fishing));
                     *///?} else if forge {
-                    /*MinecraftForge.EVENT_BUS.post(new ItemFishedEvent(List.copyOf(hookedItems), this.onGround() ? 2 : 1, player.fishing));
+                    /*MinecraftForge.EVENT_BUS.post(new ItemFishedEvent(List.copyOf(hookedItemsCopy), this.onGround() ? 2 : 1, player.fishing));
                     *///?}
 
                     for (ItemStack stack : hookedItems) {
@@ -614,11 +615,16 @@ public class TideFishingHook extends Projectile {
                             entity = CompatHelper.hybridAquaticPullEntity(itemEntity, player, this);
                         }
                         if (Tide.PLATFORM.isModLoaded("fishingreal") && entity instanceof ItemEntity) {
+                            //? if forge || neoforge {
+                            /*// fishing real handles catches automatically on neo/forge
+                            entity = null;
+                            *///?} else {
                             Entity converted = CompatHelper.fishingRealConvertItemStack(stack, player, position());
                             if (converted != null) {
                                 entity = converted;
                                 this.level().addFreshEntity(converted);
                             }
+                            //?}
                         }
                         if (entity instanceof ItemEntity) {
                             this.level().addFreshEntity(entity);

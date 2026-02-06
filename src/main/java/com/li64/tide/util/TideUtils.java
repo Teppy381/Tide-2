@@ -179,15 +179,14 @@ public class TideUtils {
         return holder.unwrap().map(ResourceKey::location, BuiltInRegistries.ITEM::getKey);
     }
 
-    //? if >=1.21 {
-    public static LootTable getLootTable(ResourceKey<LootTable> key, MinecraftServer server) {
-        return server.reloadableRegistries().getLootTable(key);
-    }
-
     public static long getTimeOfDay(ServerLevel level) {
         return level.getDayTime() % 24000;
     }
 
+    //? if >=1.21 {
+    public static LootTable getLootTable(ResourceKey<LootTable> key, MinecraftServer server) {
+        return server.reloadableRegistries().getLootTable(key);
+    }
     //?} else {
     /*public static LootTable getLootTable(ResourceLocation id, MinecraftServer server) {
          return server.getLootData().getLootTable(id);

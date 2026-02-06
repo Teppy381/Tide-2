@@ -1,16 +1,21 @@
 package com.li64.tide.registries.items;
 
-import com.li64.tide.Tide;
-import com.li64.tide.network.messages.VoidseekerRespawnMsg;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
+/*? if >=1.21 {*/import net.minecraft.world.level.portal.DimensionTransition;
+/*?} else*//*import net.minecraft.world.entity.player.Player;*/
+
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class VoidseekerItem extends SimpleTooltipItem {
@@ -21,9 +26,25 @@ public class VoidseekerItem extends SimpleTooltipItem {
     public @NotNull ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
         ItemStack result = super.finishUsingItem(stack, level, entity);
         if (!(entity instanceof ServerPlayer player)) return result;
+
         player.getCooldowns().addCooldown(this, 20);
-        player.wonGame = true;
-        Tide.NETWORK.sendToPlayer(new VoidseekerRespawnMsg(), player);
+        player.resetFallDistance(); // secret tech?!?
+        ResourceKey<Level> dimension = player.getRespawnDimension();
+
+        if (player.getServer() != null && player.getRespawnPosition() != null) {
+            ServerLevel respawnLevel = player.getServer().getLevel(dimension);
+            if (respawnLevel == null) return result;
+
+            //? if >=1.21 {
+            Optional<Vec3> respawnPos = Optional.of(player.findRespawnPositionAndUseSpawnBlock(true, DimensionTransition.DO_NOTHING).pos());
+            //?} else {
+            /*Optional<Vec3> respawnPos = Player.findRespawnPositionAndUseSpawnBlock(
+                    respawnLevel, player.getRespawnPosition(), player.getRespawnAngle(),
+                    false, true);
+            *///?}
+            respawnPos.ifPresent(pos -> player.teleportTo(respawnLevel,
+                    pos.x(), pos.y(), pos.z(), player.getRespawnAngle(), 0f));
+        }
         return result;
     }
 

@@ -3087,7 +3087,7 @@ public class TideFish {
         return ORDERED;
     }
 
-    private static class Builder {
+    public static class Builder {
         private final String id;
         private final Item.Properties properties = new Item.Properties();
         private Function<Item.Properties, Item> factory = Item::new;

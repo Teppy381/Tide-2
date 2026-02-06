@@ -1,5 +1,7 @@
 {
-   "associated_mod": "hybrid-aquatic",
+   "associated_mods": [
+      "hybrid-aquatic"
+   ],
    "weight": 1.0,
    "block": {
       "type": "minecraft:weighted_state_provider",

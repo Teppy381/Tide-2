@@ -1,14 +1,13 @@
-## Tide v2.0.3 - 2/??/26
+## Tide v2.0.3 - 2/06/26
 
 ### Changes
-- Fixed a critical bug where fish with time conditions were uncatchable after Day 0
-- Optional `associated_mods` property added to all fishing data files
+- Optional `associated_mods` property added to all fishing data files. If populated with mod IDs, the data file will only be loaded when all the specified mods are present.
 
-### TODO
-- Fix chest rendering bug with crate entities
-- Fix Voidseeker not working on forge 1.20.1
-- Fix fishing real not logging catches
-- Fix mouse tweaks satchel bug
+---
+### Fixes
+- **Fixed a critical bug where fish with time conditions were uncatchable after Day 0**
+- Fish caught with Fishing Real will now be properly logged in the journal on forge and neoforge
+- Fixed a bug where eating the Voidseeker would separate the player's soul from their body
 
 ---
 
