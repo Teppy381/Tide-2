@@ -1,5 +1,6 @@
 ## Tide v2.0.3 - 2/06/26
 
+---
 ### Changes
 - Optional `associated_mods` property added to all fishing data files. If populated with mod IDs, the data file will only be loaded when all the specified mods are present.
 
